@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Card buildListItem(String commentText) {
+  buildListItem(String commentText) {
   return Card(
     child: Column(
       children: <Widget>[
@@ -55,13 +55,15 @@ Card buildListItem(String commentText) {
             //crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              Text(
-                commentText,
-                textDirection: TextDirection.rtl,
-                textAlign: TextAlign.right,
-                overflow: TextOverflow.visible,
-                maxLines: 4,
-                style: TextStyle(fontWeight: FontWeight.w300),
+              Expanded(
+                child: Text(
+                  commentText,
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  overflow: TextOverflow.visible,
+                  maxLines: 4,
+                  style: TextStyle(fontWeight: FontWeight.w300),
+                ),
               ),
             ],
           ),
@@ -70,3 +72,6 @@ Card buildListItem(String commentText) {
     ),
   );
 }
+
+
+// Image picker..

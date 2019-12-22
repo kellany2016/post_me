@@ -15,6 +15,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   String profilePage = 'حسابي';
   String textFieldContent = '';
   TextEditingController controller = new TextEditingController();
+  List<Card> cards = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -112,30 +114,29 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
 // الرئيسيه
   Widget _buildMainPage(BuildContext myContext) {
-    List<Card> cards = [];
+
     AlertDialog blogDialog = AlertDialog(
       content: buildDialog(),
       actions: <Widget>[
         Padding(
           padding: const EdgeInsets.only(right: 5.0),
-          child: Container(
+          child: RaisedButton(
+            elevation: 5.0,
             color: Colors.green,
-            height: 30.0,
-            child: RaisedButton(
-              elevation: 5.0,
-              child: Text(
-                'نشر',
-                style: TextStyle(color: Colors.white),
-              ),
-              onPressed: () {
-                setState(() {
-                  cards.add(buildListItem(textFieldContent));
-                  print('${cards.length} from el nashr');
-                });
-                Navigator.of(myContext).pop();
-                controller.clear();
-              },
+            child: Text(
+              'نشر',
+              style: TextStyle(color: Colors.white),
             ),
+            onPressed: (){
+              setState((){
+
+                cards.add(buildListItem(textFieldContent));
+                print(textFieldContent);
+                print('${cards.length} from el nashr');
+              });
+              Navigator.of(myContext).pop();
+              controller.clear();
+            },
           ),
         ),
         Padding(
@@ -156,27 +157,25 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             backgroundColor: Color(0xFF39796b),
             onPressed: () => showDialog(
                 context: myContext, builder: (myContext) => blogDialog)),
-        body: SafeArea(
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: ListView.builder(
-                    itemCount: cards.length,
-                    itemBuilder: (myContext, int Index) {
-                      return ListTile(
-                        title: cards[Index],
-                      );
-                    }),
-              ),
-            ],
-          ),
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: ListView.builder(
+                  itemCount: cards.length,
+                  itemBuilder: (myContext, int index){
+                    print('${cards.length} from builder');
+                    return cards[index];
+                  }),
+            ),
+          ],
         )
         );
   }
 
   Widget buildDialog() {
+    Size screenSize = MediaQuery.of(context).size;
     return Container(
-      height: 300.0,
+      height: screenSize.height/3.0,
       child: Column(
         children: <Widget>[
           Container(
@@ -210,7 +209,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               )
             ],
           ),
-          //Text('اكتب تعليقا حول الصوره'ئ, textDirection: TextDirection.rtl,),
           Expanded(
             child: TextField(
               textDirection: TextDirection.rtl,
@@ -220,7 +218,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               autocorrect: true,
               autofocus: true,
               cursorColor: Colors.black26,
-              onSubmitted: (val) {
+              onChanged:
+               (val) {
                 setState(() {
                   textFieldContent = val;
                 });
