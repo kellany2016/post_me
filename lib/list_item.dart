@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 
-  buildListItem(String commentText) {
+
+  buildListItem(String commentText,File image) {
   return Card(
     child: Column(
       children: <Widget>[
@@ -47,7 +49,7 @@ import 'package:flutter/material.dart';
           color: Colors.grey,
           width: double.infinity,
           height: 200.0,
-          child: Image.asset('assets/images/ahmed.jpg'),
+          child: Image.file(image),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -62,7 +64,7 @@ import 'package:flutter/material.dart';
                   textAlign: TextAlign.right,
                   overflow: TextOverflow.visible,
                   maxLines: 4,
-                  style: TextStyle(fontWeight: FontWeight.w300),
+                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 18.0),
                 ),
               ),
             ],
@@ -74,4 +76,4 @@ import 'package:flutter/material.dart';
 }
 
 
-// Image picker..
+

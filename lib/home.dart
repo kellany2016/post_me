@@ -1,6 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import './profile.dart';
 import './list_item.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:toast/toast.dart';
 
 class Home extends StatefulWidget {
   const Home({Key key}) : super(key: key);
@@ -10,13 +14,14 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
-  String appBarTitle = 'الرئيسيه';
   String mainPage = 'الرئيسيه';
   String profilePage = 'حسابي';
   String textFieldContent = '';
   TextEditingController controller = new TextEditingController();
   List<Card> cards = [];
 
+  File _image;
+  String tabName;
 
   @override
   Widget build(BuildContext context) {
@@ -24,20 +29,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       Tab(text: 'حسابي'),
       Tab(text: 'الرئيسيه'),
     ];
-
-    TabController _tabController;
-
-    @override
-    void initState() {
-      super.initState();
-      _tabController = TabController(vsync: this, length: myTabs.length);
-    }
-
-    @override
-    void dispose() {
-      _tabController.dispose();
-      super.dispose();
-    }
 
     return DefaultTabController(
       length: 2,
@@ -48,7 +39,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             Padding(
               padding: const EdgeInsets.only(top: 10.0, right: 12.0),
               child: Text(
-                appBarTitle,
+                tabName == mainPage ? mainPage : profilePage,
                 style: TextStyle(fontSize: 18.0),
               ),
             ),
@@ -61,14 +52,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             ),
           ],
           bottom: TabBar(
-            controller: _tabController,
             tabs: myTabs,
           ),
         ),
         body: TabBarView(
-          controller: _tabController,
           children: myTabs.map((Tab tab) {
             final String label = tab.text;
+            tabName = tab.text;
             return mainPage == label
                 ? _buildMainPage(context)
                 : _buildProfile();
@@ -114,7 +104,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
 // الرئيسيه
   Widget _buildMainPage(BuildContext myContext) {
-
     AlertDialog blogDialog = AlertDialog(
       content: buildDialog(),
       actions: <Widget>[
@@ -127,14 +116,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               'نشر',
               style: TextStyle(color: Colors.white),
             ),
-            onPressed: (){
-              setState((){
-
-                cards.add(buildListItem(textFieldContent));
-                print(textFieldContent);
-                print('${cards.length} from el nashr');
+            onPressed: () {
+              setState(() {
+                cards.add(buildListItem(textFieldContent, _image));
               });
               Navigator.of(myContext).pop();
+              _image = null;
               controller.clear();
             },
           ),
@@ -143,7 +130,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           padding: const EdgeInsets.only(right: 60.0),
           child: FlatButton(
             child: Text('تجاهل'),
-            onPressed: () => Navigator.of(myContext).pop(),
+            onPressed: () {
+              Navigator.of(myContext).pop();
+              controller.clear();
+              _image = null;
+            },
           ),
         )
       ],
@@ -162,40 +153,93 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             Expanded(
               child: ListView.builder(
                   itemCount: cards.length,
-                  itemBuilder: (myContext, int index){
-                    print('${cards.length} from builder');
+                  itemBuilder: (myContext, int index) {
                     return cards[index];
                   }),
             ),
           ],
-        )
-        );
+        ));
+  }
+
+  Future getImageFromCam() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.camera);
+    setState(() {
+      _image = image;
+    });
+    Navigator.of(context).pop();
+    Toast.show('لقد تم التقاط صورتك ، اترك تعليق ثم اضغط نشر', context,
+        duration: Toast.LENGTH_SHORT, gravity: Toast.BOTTOM);
+  }
+
+  Future getImageFromGallery() async {
+    var image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _image = image;
+    });
+    Navigator.of(context).pop();
+    Toast.show('لقد تم التقاط صورتك ، اترك تعليق ثم اضغط نشر', context,
+        duration: Toast.LENGTH_SHORT,
+        gravity: Toast.BOTTOM,
+        backgroundColor: Colors.green);
   }
 
   Widget buildDialog() {
     Size screenSize = MediaQuery.of(context).size;
+    SimpleDialog photoDialog = SimpleDialog(
+      title: Text('Pick a photo'),
+      children: <Widget>[
+        Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            FlatButton(
+              child: Text(
+                'التقط صوره',
+                textDirection: TextDirection.rtl,
+              ),
+              onPressed: getImageFromCam,
+            ),
+            FlatButton(
+              child: Text(
+                'صوره من الهاتف',
+                textDirection: TextDirection.rtl,
+              ),
+              onPressed: getImageFromGallery,
+            )
+          ],
+        ),
+      ],
+    );
     return Container(
-      height: screenSize.height/3.0,
+      height: screenSize.height / 3.0,
       child: Column(
         children: <Widget>[
-          Container(
+          GestureDetector(
+            onTap: () {
+              showDialog(context: context, builder: (context) => photoDialog);
+            },
+            child: Container(
               color: Colors.black12,
               height: 150.0,
               width: double.infinity,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.photo_camera,
-                    color: Colors.grey,
-                  ),
-                  Text(
-                    'Upload Photo',
-                    style: TextStyle(color: Colors.grey, fontSize: 14.0),
-                  )
-                ],
-              )),
+              child: _image == null
+                  ? Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        Icon(
+                          Icons.photo_camera,
+                          color: Colors.grey,
+                        ),
+                        Text(
+                          'Upload Photo',
+                          style: TextStyle(color: Colors.grey, fontSize: 14.0),
+                        )
+                      ],
+                    )
+                  : Image.file(_image),
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -218,8 +262,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               autocorrect: true,
               autofocus: true,
               cursorColor: Colors.black26,
-              onChanged:
-               (val) {
+              onChanged: (val) {
                 setState(() {
                   textFieldContent = val;
                 });
