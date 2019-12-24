@@ -13,8 +13,7 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
-
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //Fields..
   String mainPage = 'الرئيسيه';
   String profilePage = 'حسابي';
@@ -28,7 +27,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
     Tab(text: 'الرئيسيه'),
   ];
 
-  TabController _tabController ;
+  TabController _tabController;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +36,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
     return DefaultTabController(
       length: 2,
       initialIndex: 1,
-
       child: Scaffold(
         appBar: AppBar(
           title: Text('Post Me'),
@@ -50,7 +48,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
         ),
         body: TabBarView(
           controller: _tabController,
-          children: myTabs.map((Tab tab){
+          children: myTabs.map((Tab tab) {
             final String label = tab.text;
             return mainPage == label
                 ? _buildMainPage(context)
@@ -96,7 +94,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
   }
 
 // الرئيسيه
-  Widget _buildMainPage(BuildContext myContext){
+  Widget _buildMainPage(BuildContext myContext) {
     AlertDialog blogDialog = AlertDialog(
       content: buildDialog(),
       actions: <Widget>[
@@ -141,22 +139,29 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
             backgroundColor: Color(0xFF39796b),
             onPressed: () => showDialog(
                 context: myContext, builder: (myContext) => blogDialog)),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: ListView.builder(
-                  itemCount: cards.length,
-                  itemBuilder: (myContext, int index) {
-                    return cards[index];
-                  }),
-            ),
-          ],
-        ));
+        body: cards.length == 0
+            ? Center(
+                child: Text(
+                  'No Posts Yet',
+                  style: TextStyle(fontSize: 24.0),
+                ),
+              )
+            : Column(
+                children: <Widget>[
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: cards.length,
+                        itemBuilder: (myContext, int index) {
+                          return cards[index];
+                        }),
+                  ),
+                ],
+              ));
   }
 
   Future getImageFromCam() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
-    setState((){
+    setState(() {
       _image = image;
     });
     Navigator.of(context).pop();
@@ -176,7 +181,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
         backgroundColor: Colors.green);
   }
 
-  Widget buildDialog(){
+  Widget buildDialog() {
     Size screenSize = MediaQuery.of(context).size;
     SimpleDialog photoDialog = SimpleDialog(
       title: Text('Pick a photo'),
