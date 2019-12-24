@@ -13,52 +13,45 @@ class Home extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
+class _HomeState extends State<Home> with SingleTickerProviderStateMixin{
+
+  //Fields..
   String mainPage = 'الرئيسيه';
   String profilePage = 'حسابي';
   String textFieldContent = '';
   TextEditingController controller = new TextEditingController();
   List<Card> cards = [];
-
   File _image;
-  String tabName;
+
+  final List<Tab> myTabs = <Tab>[
+    Tab(text: 'حسابي'),
+    Tab(text: 'الرئيسيه'),
+  ];
+
+  TabController _tabController ;
 
   @override
   Widget build(BuildContext context) {
-    final List<Tab> myTabs = <Tab>[
-      Tab(text: 'حسابي'),
-      Tab(text: 'الرئيسيه'),
-    ];
+    //Tabs for tab view ..
 
     return DefaultTabController(
       length: 2,
       initialIndex: 1,
+
       child: Scaffold(
         appBar: AppBar(
-          actions: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 10.0, right: 12.0),
-              child: Text(
-                tabName == mainPage ? mainPage : profilePage,
-                style: TextStyle(fontSize: 18.0),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 5.0),
-              child: Icon(
-                Icons.menu,
-                size: 30.0,
-              ),
-            ),
-          ],
+          title: Text('Post Me'),
+          centerTitle: true,
+          leading: Icon(Icons.menu),
           bottom: TabBar(
             tabs: myTabs,
+            controller: _tabController,
           ),
         ),
         body: TabBarView(
-          children: myTabs.map((Tab tab) {
+          controller: _tabController,
+          children: myTabs.map((Tab tab){
             final String label = tab.text;
-            tabName = tab.text;
             return mainPage == label
                 ? _buildMainPage(context)
                 : _buildProfile();
@@ -103,7 +96,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
 // الرئيسيه
-  Widget _buildMainPage(BuildContext myContext) {
+  Widget _buildMainPage(BuildContext myContext){
     AlertDialog blogDialog = AlertDialog(
       content: buildDialog(),
       actions: <Widget>[
@@ -163,7 +156,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   Future getImageFromCam() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
-    setState(() {
+    setState((){
       _image = image;
     });
     Navigator.of(context).pop();
@@ -183,7 +176,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.green);
   }
 
-  Widget buildDialog() {
+  Widget buildDialog(){
     Size screenSize = MediaQuery.of(context).size;
     SimpleDialog photoDialog = SimpleDialog(
       title: Text('Pick a photo'),
