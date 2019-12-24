@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+//flutter files..
 import './profile.dart';
 import './list_item.dart';
+
+//packages used for features..
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:toast/toast.dart';
@@ -16,23 +20,19 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //Fields..
   String mainPage = 'الرئيسيه';
-  String profilePage = 'حسابي';
   String textFieldContent = '';
   TextEditingController controller = new TextEditingController();
   List<Card> cards = [];
   File _image;
 
+  //Tabs for tab view ..
   final List<Tab> myTabs = <Tab>[
     Tab(text: 'حسابي'),
     Tab(text: 'الرئيسيه'),
   ];
 
-  TabController _tabController;
-
   @override
   Widget build(BuildContext context) {
-    //Tabs for tab view ..
-
     return DefaultTabController(
       length: 2,
       initialIndex: 1,
@@ -43,11 +43,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           leading: Icon(Icons.menu),
           bottom: TabBar(
             tabs: myTabs,
-            controller: _tabController,
           ),
         ),
         body: TabBarView(
-          controller: _tabController,
           children: myTabs.map((Tab tab) {
             final String label = tab.text;
             return mainPage == label
@@ -159,6 +157,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
               ));
   }
 
+  // Image Picker From Simple Dialog Functions..
   Future getImageFromCam() async {
     var image = await ImagePicker.pickImage(source: ImageSource.camera);
     setState(() {
@@ -181,6 +180,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         backgroundColor: Colors.green);
   }
 
+// Simple Dialog
   Widget buildDialog() {
     Size screenSize = MediaQuery.of(context).size;
     SimpleDialog photoDialog = SimpleDialog(
